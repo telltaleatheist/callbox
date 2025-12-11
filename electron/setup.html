@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>CallBox - Select Account</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 40px;
+      width: 420px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .logo h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: #ff6b35;
+    }
+    .logo p {
+      color: #888;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    /* Account list */
+    .accounts-list {
+      margin-bottom: 20px;
+    }
+    .account-item {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .account-item:hover {
+      background: rgba(255, 107, 53, 0.15);
+      border-color: #ff6b35;
+    }
+    .account-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff6b35 0%, #ff8555 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 16px;
+      margin-right: 14px;
+    }
+    .account-info {
+      flex: 1;
+    }
+    .account-email {
+      font-size: 14px;
+      color: #fff;
+    }
+    .account-label {
+      font-size: 12px;
+      color: #888;
+      margin-top: 2px;
+    }
+    .account-remove {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(255, 68, 68, 0.2);
+      border: none;
+      color: #ff4444;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .account-item:hover .account-remove {
+      opacity: 1;
+    }
+    .account-remove:hover {
+      background: rgba(255, 68, 68, 0.4);
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 30px;
+      color: #666;
+    }
+    .empty-state p {
+      font-size: 14px;
+    }
+
+    /* Add account section */
+    .add-account-btn {
+      width: 100%;
+      padding: 14px;
+      background: transparent;
+      color: #ff6b35;
+      border: 2px dashed rgba(255, 107, 53, 0.4);
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 16px;
+    }
+    .add-account-btn:hover {
+      background: rgba(255, 107, 53, 0.1);
+      border-color: #ff6b35;
+    }
+
+    /* Add account form */
+    .add-form {
+      display: none;
+    }
+    .add-form.active {
+      display: block;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: #aaa;
+    }
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.3);
+      color: #fff;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+    input:focus {
+      outline: none;
+      border-color: #ff6b35;
+    }
+    input::placeholder {
+      color: #666;
+    }
+    .form-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    .btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: #ff6b35;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: #ff8555;
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #aaa;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .error {
+      color: #ff4444;
+      font-size: 13px;
+      margin-top: 12px;
+      text-align: center;
+      display: none;
+    }
+
+    .security-note {
+      margin-top: 20px;
+      padding: 12px;
+      background: rgba(255, 107, 53, 0.1);
+      border-radius: 8px;
+      font-size: 11px;
+      color: #888;
+      text-align: center;
+    }
+    .security-note strong {
+      color: #ff6b35;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <h1>CallBox</h1>
+      <p>Select an account to sign in</p>
+    </div>
+
+    <div id="accounts-section">
+      <div class="accounts-list" id="accounts-list">
+        <!-- Accounts will be populated here -->
+      </div>
+
+      <div class="empty-state" id="empty-state" style="display: none;">
+        <p>No saved accounts yet.<br>Add an account to get started.</p>
+      </div>
+
+      <button class="add-account-btn" id="add-account-btn">+ Add Account</button>
+    </div>
+
+    <div class="add-form" id="add-form">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="your@email.com" required>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" required>
+      </div>
+
+      <div class="form-buttons">
+        <button class="btn btn-secondary" id="cancel-btn">Cancel</button>
+        <button class="btn btn-primary" id="save-btn">Add & Sign In</button>
+      </div>
+
+      <p class="error" id="error-msg"></p>
+    </div>
+
+    <div class="security-note">
+      <strong>🔒 Secure Storage</strong><br>
+      Credentials are encrypted using your system's keychain.
+    </div>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    const accountsList = document.getElementById('accounts-list');
+    const emptyState = document.getElementById('empty-state');
+    const accountsSection = document.getElementById('accounts-section');
+    const addAccountBtn = document.getElementById('add-account-btn');
+    const addForm = document.getElementById('add-form');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const cancelBtn = document.getElementById('cancel-btn');
+    const saveBtn = document.getElementById('save-btn');
+    const errorMsg = document.getElementById('error-msg');
+
+    // Load and display accounts
+    async function loadAccounts() {
+      const accounts = await ipcRenderer.invoke('get-accounts');
+      accountsList.innerHTML = '';
+
+      if (accounts.length === 0) {
+        emptyState.style.display = 'block';
+        accountsList.style.display = 'none';
+      } else {
+        emptyState.style.display = 'none';
+        accountsList.style.display = 'block';
+
+        accounts.forEach(account => {
+          const initials = account.email.substring(0, 2).toUpperCase();
+          const item = document.createElement('div');
+          item.className = 'account-item';
+          item.innerHTML = `
+            <div class="account-avatar">${initials}</div>
+            <div class="account-info">
+              <div class="account-email">${account.email}</div>
+              <div class="account-label">Click to sign in</div>
+            </div>
+            <button class="account-remove" data-email="${account.email}" title="Remove account">&times;</button>
+          `;
+
+          // Click to select account
+          item.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('account-remove')) return;
+            await ipcRenderer.invoke('select-account', account.email);
+          });
+
+          // Remove button
+          const removeBtn = item.querySelector('.account-remove');
+          removeBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            if (confirm('Remove this account?')) {
+              await ipcRenderer.invoke('remove-account', account.email);
+              loadAccounts();
+            }
+          });
+
+          accountsList.appendChild(item);
+        });
+      }
+    }
+
+    // Show add form
+    addAccountBtn.addEventListener('click', () => {
+      accountsSection.querySelector('.accounts-list').style.display = 'none';
+      emptyState.style.display = 'none';
+      addAccountBtn.style.display = 'none';
+      addForm.classList.add('active');
+      emailInput.focus();
+    });
+
+    // Cancel add form
+    cancelBtn.addEventListener('click', () => {
+      addForm.classList.remove('active');
+      addAccountBtn.style.display = 'block';
+      emailInput.value = '';
+      passwordInput.value = '';
+      errorMsg.style.display = 'none';
+      loadAccounts();
+    });
+
+    // Save new account
+    saveBtn.addEventListener('click', async () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!email || !password) {
+        errorMsg.textContent = 'Please enter both email and password';
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      try {
+        // Add account and sign in
+        await ipcRenderer.invoke('add-account', { email, password });
+        await ipcRenderer.invoke('select-account', email);
+      } catch (err) {
+        errorMsg.textContent = 'Failed to save account: ' + err.message;
+        errorMsg.style.display = 'block';
+      }
+    });
+
+    // Handle enter key in form
+    passwordInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        saveBtn.click();
+      }
+    });
+
+    // Initial load
+    loadAccounts();
+  </script>
+</body>
+</html>

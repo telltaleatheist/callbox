@@ -1,0 +1,52 @@
+{
+  "name": "callbox",
+  "version": "1.0.0",
+  "description": "Simple browser wrapper for Call In Studio with audio device controls",
+  "author": "Your Name",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "electron:dev": "electron .",
+    "package:mac": "electron-builder --mac --x64 --arm64",
+    "package:mac-arm64": "electron-builder --mac --arm64",
+    "package:mac-intel": "electron-builder --mac --x64",
+    "package:win-x64": "electron-builder --win --x64"
+  },
+  "private": true,
+  "dependencies": {
+    "electron-store": "^8.1.0",
+    "grandiose": "github:rse/grandiose"
+  },
+  "devDependencies": {
+    "electron": "^39.2.6",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.callbox.app",
+    "productName": "CallBox",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "electron/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.social-networking",
+      "icon": "assets/icon.icns",
+      "target": "dmg",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist"
+    },
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    }
+  }
+}
