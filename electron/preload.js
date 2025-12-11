@@ -16,6 +16,7 @@ function injectMainWorldScript() {
   let audioContext = null;
   let ndiProcessor = null;
   let ndiEnabled = false;
+  let masterVolume = 100; // Volume 0-100
   const capturedStreams = new Set();
 
   function initAudioContext() {
@@ -29,9 +30,10 @@ function injectMainWorldScript() {
       const left = e.inputBuffer.getChannelData(0);
       const right = e.inputBuffer.getChannelData(1);
       const interleaved = new Float32Array(left.length * 2);
+      const volumeMultiplier = masterVolume / 100; // Convert 0-100 to 0.0-1.0
       for (let i = 0; i < left.length; i++) {
-        interleaved[i * 2] = left[i];
-        interleaved[i * 2 + 1] = right[i];
+        interleaved[i * 2] = left[i] * volumeMultiplier;
+        interleaved[i * 2 + 1] = right[i] * volumeMultiplier;
       }
       // Send to preload via postMessage
       window.postMessage({
@@ -69,7 +71,7 @@ function injectMainWorldScript() {
     }
   }
 
-  // Listen for NDI enable/disable from preload
+  // Listen for NDI enable/disable and volume changes from preload
   window.addEventListener('message', (e) => {
     if (e.data && e.data.type === 'callbox-ndi-enable') {
       ndiEnabled = e.data.enabled;
@@ -85,6 +87,9 @@ function injectMainWorldScript() {
           }
         });
       }
+    } else if (e.data && e.data.type === 'callbox-volume-change') {
+      masterVolume = e.data.volume;
+      console.log('[CallBox] Volume changed to:', masterVolume + '%');
     }
   });
 
@@ -261,6 +266,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (savedNdiEnabled) {
       log('NDI was already enabled - syncing to main world');
       window.postMessage({ type: 'callbox-ndi-enable', enabled: true }, '*');
+      // Also sync the current volume
+      window.postMessage({ type: 'callbox-volume-change', volume: masterVolume }, '*');
     }
 
 
@@ -403,6 +410,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('callbox-vol-label').textContent = masterVolume + '%';
     ipcRenderer.send('set-master-volume', masterVolume);
     applyMasterVolume();
+    // Also update NDI audio volume in main world
+    window.postMessage({ type: 'callbox-volume-change', volume: masterVolume }, '*');
   });
 
   // NDI toggle
@@ -440,6 +449,8 @@ window.addEventListener('DOMContentLoaded', async () => {
           // Tell main world to start capturing WebRTC audio
           log('Enabling NDI capture in main world...');
           window.postMessage({ type: 'callbox-ndi-enable', enabled: true }, '*');
+          // Sync current volume to main world
+          window.postMessage({ type: 'callbox-volume-change', volume: masterVolume }, '*');
           log('NDI fully started');
         }
       }

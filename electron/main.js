@@ -139,19 +139,26 @@ function createSetupWindow() {
 function createWindow() {
   const bounds = store.get('windowBounds');
 
-  mainWindow = new BrowserWindow({
+  // Platform-specific window options
+  const windowOptions = {
     width: bounds.width,
     height: bounds.height,
     minWidth: 800,
     minHeight: 600,
-    titleBarStyle: 'hiddenInset',
-    trafficLightPosition: { x: 15, y: 12 },
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false
     }
-  });
+  };
+
+  // Apply macOS-specific styling
+  if (process.platform === 'darwin') {
+    windowOptions.titleBarStyle = 'hiddenInset';
+    windowOptions.trafficLightPosition = { x: 15, y: 12 };
+  }
+
+  mainWindow = new BrowserWindow(windowOptions);
 
   // Auto-allow audio/video permissions
   session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
